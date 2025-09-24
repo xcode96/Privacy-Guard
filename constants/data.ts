@@ -1,23 +1,48 @@
+
 import React from 'react';
-import type { Category, Script } from '../types';
+import type { Category, Script, SubCategory } from '../types';
 import { WindowsIcon } from '../components/icons/WindowsIcon';
 import { AppleIcon } from '../components/icons/AppleIcon';
 import { LinuxIcon } from '../components/icons/LinuxIcon';
 import { BrowserIcon } from '../components/icons/BrowserIcon';
 
 export const CATEGORIES: Category[] = [
-  // FIX: Replaced JSX syntax with React.createElement to avoid parsing errors in .ts file.
   { id: 'win', name: 'Windows', icon: React.createElement(WindowsIcon) },
   { id: 'mac', name: 'macOS', icon: React.createElement(AppleIcon) },
   { id: 'linux', name: 'Linux', icon: React.createElement(LinuxIcon) },
   { id: 'browser', name: 'Browsers', icon: React.createElement(BrowserIcon) },
 ];
 
+export const SUB_CATEGORIES: SubCategory[] = [
+  // Windows
+  { id: 'win-privacy-cleanup', name: 'Privacy Cleanup', categoryId: 'win' },
+  { id: 'win-disable-os-data-collection', name: 'Disable OS Data Collection', categoryId: 'win' },
+  { id: 'win-configure-programs', name: 'Configure Programs', categoryId: 'win' },
+  { id: 'win-security-improvements', name: 'Security Improvements', categoryId: 'win' },
+  { id: 'win-block-tracking-hosts', name: 'Block Tracking Hosts', categoryId: 'win' },
+  { id: 'win-privacy-over-security', name: 'Privacy Over Security', categoryId: 'win' },
+  { id: 'win-ui-for-privacy', name: 'UI for Privacy', categoryId: 'win' },
+  { id: 'win-remove-bloatware', name: 'Remove Bloatware', categoryId: 'win' },
+  { id: 'win-advanced-settings', name: 'Advanced Settings', categoryId: 'win' },
+  // macOS
+  { id: 'mac-privacy-cleanup', name: 'Privacy Cleanup', categoryId: 'mac' },
+  { id: 'mac-configure-programs', name: 'Configure Programs', categoryId: 'mac' },
+  { id: 'mac-configure-os', name: 'Configure OS', categoryId: 'mac' },
+  { id: 'mac-security-improvements', name: 'Security Improvements', categoryId: 'mac' },
+  { id: 'mac-privacy-over-security', name: 'Privacy Over Security', categoryId: 'mac' },
+  // Linux
+  { id: 'linux-privacy-cleanup', name: 'Privacy Cleanup', categoryId: 'linux' },
+  { id: 'linux-disable-os-data-collection', name: 'Disable OS Data Collection', categoryId: 'linux' },
+  { id: 'linux-configure-programs', name: 'Configure Programs', categoryId: 'linux' },
+];
+
+
 export const INITIAL_SCRIPTS: Script[] = [
   // Windows
   {
     id: 'win-1',
     categoryId: 'win',
+    subCategoryId: 'win-disable-os-data-collection',
     name: 'Disable Telemetry',
     description: 'Stops Windows from collecting and sending diagnostic and usage data to Microsoft.',
     code: `
@@ -30,6 +55,7 @@ echo "Telemetry service disabled."
   {
     id: 'win-2',
     categoryId: 'win',
+    subCategoryId: 'win-remove-bloatware',
     name: 'Remove Bloatware Apps',
     description: 'Uninstalls common pre-installed applications like Candy Crush, Xbox apps, etc.',
     code: `
@@ -41,6 +67,7 @@ echo "Bloatware removal script executed (example). Add more apps as needed."
   {
     id: 'win-3',
     categoryId: 'win',
+    subCategoryId: 'win-disable-os-data-collection',
     name: 'Disable Cortana',
     description: 'Disables the personal assistant to prevent background activity and data collection.',
     code: `
@@ -53,6 +80,7 @@ echo "Cortana disabled."
   {
     id: 'mac-1',
     categoryId: 'mac',
+    subCategoryId: 'mac-privacy-cleanup',
     name: 'Disable Siri Analytics',
     description: 'Stops macOS from sending Siri usage data and analytics to Apple.',
     code: `
@@ -64,6 +92,7 @@ echo "Siri analytics disabled."
   {
     id: 'mac-2',
     categoryId: 'mac',
+    subCategoryId: 'mac-configure-os',
     name: 'Show Hidden Files in Finder',
     description: 'Configures Finder to always show hidden files and folders (e.g., .bash_profile).',
     code: `
@@ -77,6 +106,7 @@ echo "Finder will now show hidden files."
   {
     id: 'linux-1',
     categoryId: 'linux',
+    subCategoryId: 'linux-configure-programs',
     name: 'Harden SSH Configuration',
     description: 'Strengthens SSH security by disabling root login and password authentication.',
     code: `
@@ -90,6 +120,7 @@ echo "Remember to manually edit /etc/ssh/sshd_config and restart sshd."
   {
     id: 'linux-2',
     categoryId: 'linux',
+    subCategoryId: 'linux-configure-programs',
     name: 'Install and Configure UFW',
     description: 'Sets up Uncomplicated Firewall (UFW) to block incoming connections by default.',
     code: `

@@ -1,26 +1,43 @@
-import React, { useState, useMemo } from 'react';
-import type { Script, Category } from '../types';
+
+import React, { useState, useMemo, useEffect } from 'react';
+import type { Script, Category, SubCategory } from '../types';
 
 interface AddScriptModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddScript: (script: Omit<Script, 'id'>) => void;
   categories: Category[];
+  subCategories: SubCategory[];
 }
 
-export const AddScriptModal: React.FC<AddScriptModalProps> = ({ isOpen, onClose, onAddScript, categories }) => {
+export const AddScriptModal: React.FC<AddScriptModalProps> = ({ isOpen, onClose, onAddScript, categories, subCategories }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [code, setCode] = useState('');
   const [categoryId, setCategoryId] = useState(categories[0]?.id || '');
+  const [subCategoryId, setSubCategoryId] = useState('');
+
+  const relevantSubCategories = useMemo(() => 
+    subCategories.filter(sc => sc.categoryId === categoryId),
+    [categoryId, subCategories]
+  );
+  
+  useEffect(() => {
+    // Auto-select the first sub-category when the category changes
+    if (relevantSubCategories.length > 0) {
+      setSubCategoryId(relevantSubCategories[0].id);
+    } else {
+      setSubCategoryId('');
+    }
+  }, [categoryId, relevantSubCategories]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !description || !code || !categoryId) {
+    if (!name || !description || !code || !categoryId || (relevantSubCategories.length > 0 && !subCategoryId)) {
       alert('Please fill out all fields.');
       return;
     }
-    onAddScript({ name, description, code, categoryId });
+    onAddScript({ name, description, code, categoryId, subCategoryId: subCategoryId || undefined });
     // Reset form
     setName('');
     setDescription('');
@@ -77,18 +94,36 @@ export const AddScriptModal: React.FC<AddScriptModalProps> = ({ isOpen, onClose,
               required
             />
           </div>
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-zinc-300 mb-1">Category</label>
-            <select
-              id="category"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full bg-black/30 text-zinc-200 border border-white/10 rounded-md p-2.5 focus:ring-2 focus:ring-fuchsia-500 focus:outline-none transition-all"
-            >
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id} className="bg-[#100e19]">{cat.name}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium text-zinc-300 mb-1">Category</label>
+              <select
+                id="category"
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                className="w-full bg-black/30 text-zinc-200 border border-white/10 rounded-md p-2.5 focus:ring-2 focus:ring-fuchsia-500 focus:outline-none transition-all"
+              >
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id} className="bg-[#100e19]">{cat.name}</option>
+                ))}
+              </select>
+            </div>
+             {relevantSubCategories.length > 0 && (
+              <div>
+                <label htmlFor="subCategory" className="block text-sm font-medium text-zinc-300 mb-1">Sub-Category</label>
+                <select
+                  id="subCategory"
+                  value={subCategoryId}
+                  onChange={(e) => setSubCategoryId(e.target.value)}
+                  className="w-full bg-black/30 text-zinc-200 border border-white/10 rounded-md p-2.5 focus:ring-2 focus:ring-fuchsia-500 focus:outline-none transition-all"
+                  required
+                >
+                  {relevantSubCategories.map(subCat => (
+                    <option key={subCat.id} value={subCat.id} className="bg-[#100e19]">{subCat.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <button

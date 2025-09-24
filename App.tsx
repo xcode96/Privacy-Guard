@@ -1,10 +1,11 @@
+
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { MainContent } from './components/MainContent';
 import { Footer } from './components/Footer';
 import { AddScriptModal } from './components/AddScriptModal';
-import { CATEGORIES, INITIAL_SCRIPTS } from './constants/data';
+import { CATEGORIES, INITIAL_SCRIPTS, SUB_CATEGORIES } from './constants/data';
 import type { Script } from './types';
 import { SearchIcon } from './components/icons/SearchIcon';
 
@@ -151,20 +152,17 @@ ${shellScripts.map(s => `# - ${s.name}`).join('\n')}
   const handleExportConfig = useCallback(() => {
     const fileContent = `
 import React from 'react';
-import type { Category, Script } from '../types';
+import type { Category, Script, SubCategory } from '../types';
 import { WindowsIcon } from '../components/icons/WindowsIcon';
 import { AppleIcon } from '../components/icons/AppleIcon';
 import { LinuxIcon } from '../components/icons/LinuxIcon';
 import { BrowserIcon } from '../components/icons/BrowserIcon';
 
-export const CATEGORIES: Category[] = [
-  { id: 'win', name: 'Windows', icon: React.createElement(WindowsIcon) },
-  { id: 'mac', name: 'macOS', icon: React.createElement(AppleIcon) },
-  { id: 'linux', name: 'Linux', icon: React.createElement(LinuxIcon) },
-  { id: 'browser', name: 'Browsers', icon: React.createElement(BrowserIcon) },
-];
+export const CATEGORIES: Category[] = ${JSON.stringify(CATEGORIES, null, 2).replace(/"(React\.createElement\(.+?\))"/g, '$1')};
 
-export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2).replace(/"(React\.createElement\(.+?\))"/g, '$1')};
+export const SUB_CATEGORIES: SubCategory[] = ${JSON.stringify(SUB_CATEGORIES, null, 2)};
+
+export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
 `;
     const blob = new Blob([fileContent.trim()], { type: 'application/typescript' });
     const url = URL.createObjectURL(blob);
@@ -211,6 +209,7 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2).repl
                 isAdmin={isAdmin}
                 onAddScriptClick={() => setIsAddModalOpen(true)}
                 isSearching={isSearching}
+                subCategories={SUB_CATEGORIES}
               />
               <Footer
                 selectedCount={selectedScripts.size}
@@ -225,6 +224,7 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2).repl
         onClose={() => setIsAddModalOpen(false)}
         onAddScript={handleAddNewScript}
         categories={CATEGORIES}
+        subCategories={SUB_CATEGORIES}
       />
     </div>
   );

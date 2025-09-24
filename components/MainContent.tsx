@@ -1,6 +1,9 @@
-import React from 'react';
-import type { Script } from '../types';
+
+
+import React, { useMemo } from 'react';
+import type { Script, SubCategory } from '../types';
 import { ScriptItem } from './ScriptItem';
+import { SubCategoryGroup } from './SubCategoryGroup';
 
 interface MainContentProps {
   title: string;
@@ -14,9 +17,20 @@ interface MainContentProps {
   isAdmin: boolean;
   onAddScriptClick: () => void;
   isSearching: boolean;
+  subCategories: SubCategory[];
 }
 
-export const MainContent: React.FC<MainContentProps> = ({ title, description, icon, scripts, selectedScripts, onScriptToggle, onSelectAll, onDeselectAll, isAdmin, onAddScriptClick, isSearching }) => {
+// FIX: Destructure subCategories from props to resolve reference errors.
+export const MainContent: React.FC<MainContentProps> = ({ title, description, icon, scripts, selectedScripts, onScriptToggle, onSelectAll, onDeselectAll, isAdmin, onAddScriptClick, isSearching, subCategories }) => {
+
+  const currentCategoryId = scripts[0]?.categoryId;
+  const categorySubCategories = useMemo(() => 
+    subCategories.filter(sc => sc.categoryId === currentCategoryId),
+    [subCategories, currentCategoryId]
+  );
+  
+  const hasSubCategories = categorySubCategories.length > 0 && !isSearching;
+  
   return (
     <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -28,7 +42,7 @@ export const MainContent: React.FC<MainContentProps> = ({ title, description, ic
                 <p className="text-zinc-400 mt-1">{description}</p>
             </div>
             <div className="flex gap-2 self-end sm:self-center">
-                {isAdmin && (
+                {isAdmin && !isSearching && (
                   <button
                     onClick={onAddScriptClick}
                     className="px-4 py-1.5 text-sm font-semibold text-white bg-gradient-to-r from-cyan-600 to-fuchsia-600 rounded-md hover:opacity-90 transition-opacity"
@@ -50,21 +64,41 @@ export const MainContent: React.FC<MainContentProps> = ({ title, description, ic
                 </button>
             </div>
         </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {scripts.map(script => (
-          <ScriptItem
-            key={script.id}
-            script={script}
-            isSelected={selectedScripts.has(script.id)}
-            onToggle={onScriptToggle}
-          />
-        ))}
-        {scripts.length === 0 && (
-          <div className="lg:col-span-2 xl:col-span-3 text-center py-12">
+
+      {hasSubCategories ? (
+        <div className="space-y-4">
+            {categorySubCategories.map(subCategory => {
+                const subCategoryScripts = scripts.filter(s => s.subCategoryId === subCategory.id);
+                if (subCategoryScripts.length === 0) return null;
+                return (
+                    <SubCategoryGroup
+                        key={subCategory.id}
+                        title={subCategory.name}
+                        scripts={subCategoryScripts}
+                        selectedScripts={selectedScripts}
+                        onScriptToggle={onScriptToggle}
+                    />
+                );
+            })}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            {scripts.map(script => (
+            <ScriptItem
+                key={script.id}
+                script={script}
+                isSelected={selectedScripts.has(script.id)}
+                onToggle={onScriptToggle}
+            />
+            ))}
+        </div>
+      )}
+
+      {scripts.length === 0 && (
+        <div className="text-center py-12">
             <p className="text-zinc-500">{isSearching ? 'No scripts found matching your search.' : 'No scripts in this category yet.'}</p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </main>
   );
 };
