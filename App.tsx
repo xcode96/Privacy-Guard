@@ -16,10 +16,11 @@ export default function App() {
   const [isAISearching, setIsAISearching] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
-    const code = prompt("Enter admin code to access the application:");
-    if (code === 'dq.adm') {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('code') === 'dq.adm') {
       setIsAdmin(true);
     }
   }, []);
@@ -124,32 +125,58 @@ ${Array.from(selectedScripts)
       ...prev,
       { ...newScript, id: `custom-${Date.now()}` }
     ]);
+    setHasUnsavedChanges(true);
     setIsAddModalOpen(false);
   };
 
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-slate-900 text-gray-300 font-sans flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-white">Access Denied</h1>
-          <p className="text-slate-400 mt-2">You need to be an admin to use this application. Please refresh and try again.</p>
-        </div>
-      </div>
-    );
-  }
+  const handleExportConfig = useCallback(() => {
+    const fileContent = `
+import React from 'react';
+import type { Category, Script } from '../types';
+import { WindowsIcon } from '../components/icons/WindowsIcon';
+import { AppleIcon } from '../components/icons/AppleIcon';
+import { LinuxIcon } from '../components/icons/LinuxIcon';
+import { BrowserIcon } from '../components/icons/BrowserIcon';
+
+export const CATEGORIES: Category[] = [
+  { id: 'win', name: 'Windows', icon: React.createElement(WindowsIcon) },
+  { id: 'mac', name: 'macOS', icon: React.createElement(AppleIcon) },
+  { id: 'linux', name: 'Linux', icon: React.createElement(LinuxIcon) },
+  { id: 'browser', name: 'Browsers', icon: React.createElement(BrowserIcon) },
+];
+
+export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2).replace(/"(React\.createElement\(.+?\))"/g, '$1')};
+`;
+    const blob = new Blob([fileContent.trim()], { type: 'application/typescript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.ts';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setHasUnsavedChanges(false);
+  }, [scripts]);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-gray-300 font-sans">
-      <div className="max-w-screen-xl mx-auto p-4 md:p-6 lg:p-8">
-        <Header onAISearch={handleAISearch} isAISearching={isAISearching} />
-        {aiError && <div className="bg-red-500/20 border border-red-500 text-red-300 text-center p-3 rounded-lg my-4">{aiError}</div>}
-        <div className="flex flex-col md:flex-row gap-8 mt-6">
-          <Sidebar
-            categories={CATEGORIES}
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-          />
-          <div className="flex-1 flex flex-col bg-slate-800/50 rounded-2xl border border-slate-700 overflow-hidden min-h-[70vh]">
+    <div className="min-h-screen w-full bg-[#0b0914] text-zinc-300 font-sans flex flex-col">
+      <Header 
+        onAISearch={handleAISearch} 
+        isAISearching={isAISearching} 
+        isAdmin={isAdmin}
+        hasUnsavedChanges={hasUnsavedChanges}
+        onExport={handleExportConfig}
+      />
+      <main className="flex-1 flex overflow-hidden">
+        <Sidebar
+          categories={CATEGORIES}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {aiError && <div className="bg-red-900/50 border border-red-700 text-red-300 text-center p-3 rounded-lg m-4">{aiError}</div>}
+          <div className="flex-1 flex flex-col overflow-hidden bg-black/20 m-4 mt-0 rounded-xl border border-white/10 shadow-lg">
               <MainContent
                 key={selectedCategory}
                 category={CATEGORIES.find(c => c.id === selectedCategory)!}
@@ -168,7 +195,7 @@ ${Array.from(selectedScripts)
               />
           </div>
         </div>
-      </div>
+      </main>
       <AddScriptModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}

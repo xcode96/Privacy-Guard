@@ -14,26 +14,27 @@
           extend: {
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+              mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
             },
           },
         },
       }
     </script>
     <style>
-        /* Custom scrollbar for a modern look */
+        /* Custom scrollbar for the new aurora theme */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #0f172a; /* bg-slate-900 */
+            background: #110f1a;
         }
         ::-webkit-scrollbar-thumb {
-            background: #334155; /* bg-slate-700 */
+            background: #4a356a;
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #475569; /* bg-slate-600 */
+            background: #6d4fa6;
         }
     </style>
   <script type="importmap">
@@ -47,7 +48,7 @@
 }
 </script>
 </head>
-  <body class="bg-slate-900 text-gray-300 antialiased font-sans">
+  <body class="bg-[#0b0914] text-zinc-300 antialiased font-sans">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
