@@ -1,9 +1,11 @@
 import React from 'react';
-import type { Category, Script } from '../types';
+import type { Script } from '../types';
 import { ScriptItem } from './ScriptItem';
 
 interface MainContentProps {
-  category: Category;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
   scripts: Script[];
   selectedScripts: Set<string>;
   onScriptToggle: (id: string) => void;
@@ -11,18 +13,19 @@ interface MainContentProps {
   onDeselectAll: () => void;
   isAdmin: boolean;
   onAddScriptClick: () => void;
+  isSearching: boolean;
 }
 
-export const MainContent: React.FC<MainContentProps> = ({ category, scripts, selectedScripts, onScriptToggle, onSelectAll, onDeselectAll, isAdmin, onAddScriptClick }) => {
+export const MainContent: React.FC<MainContentProps> = ({ title, description, icon, scripts, selectedScripts, onScriptToggle, onSelectAll, onDeselectAll, isAdmin, onAddScriptClick, isSearching }) => {
   return (
     <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div>
                 <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    {React.cloneElement(category.icon as React.ReactElement<React.SVGProps<SVGSVGElement>>, { className: "w-7 h-7 text-cyan-400" })}
-                    <span>{category.name}</span>
+                    {React.cloneElement(icon as React.ReactElement<React.SVGProps<SVGSVGElement>>, { className: "w-7 h-7 text-cyan-400" })}
+                    <span>{title}</span>
                 </h2>
-                <p className="text-zinc-400 mt-1">Select scripts to add to your collection.</p>
+                <p className="text-zinc-400 mt-1">{description}</p>
             </div>
             <div className="flex gap-2 self-end sm:self-center">
                 {isAdmin && (
@@ -58,7 +61,7 @@ export const MainContent: React.FC<MainContentProps> = ({ category, scripts, sel
         ))}
         {scripts.length === 0 && (
           <div className="lg:col-span-2 xl:col-span-3 text-center py-12">
-            <p className="text-zinc-500">No scripts in this category yet.</p>
+            <p className="text-zinc-500">{isSearching ? 'No scripts found matching your search.' : 'No scripts in this category yet.'}</p>
           </div>
         )}
       </div>

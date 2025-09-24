@@ -1,24 +1,17 @@
-import React, { useState } from 'react';
-import { SparklesIcon } from './icons/SparklesIcon';
+import React from 'react';
 import { ShieldIcon } from './icons/ShieldIcon';
 import { DownloadIcon } from './icons/DownloadIcon';
+import { SearchIcon } from './icons/SearchIcon';
 
 interface HeaderProps {
-    onAISearch: (query: string) => void;
-    isAISearching: boolean;
+    searchQuery: string;
+    onSearchQueryChange: (query: string) => void;
     isAdmin: boolean;
     hasUnsavedChanges: boolean;
     onExport: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onAISearch, isAISearching, isAdmin, hasUnsavedChanges, onExport }) => {
-    const [query, setQuery] = useState('');
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onAISearch(query);
-    };
-
+export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchQueryChange, isAdmin, hasUnsavedChanges, onExport }) => {
     return (
         <header className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 border-b border-white/10 bg-black/20 backdrop-blur-lg sticky top-0 z-40">
             <div className="flex items-center gap-3">
@@ -42,28 +35,18 @@ export const Header: React.FC<HeaderProps> = ({ onAISearch, isAISearching, isAdm
                         Export Changes
                     </button>
                 )}
-                <form onSubmit={handleSubmit} className="flex items-center gap-2 flex-grow md:w-80">
-                    <div className="relative flex-grow">
-                        <input
-                            type="text"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="e.g., 'secure my browser'"
-                            className="w-full bg-black/30 text-zinc-200 border border-white/10 rounded-md py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-fuchsia-500 focus:outline-none transition-all"
-                            disabled={isAISearching}
-                        />
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-fuchsia-400">
-                          <SparklesIcon />
-                        </div>
+                <div className="relative flex-grow md:w-80">
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => onSearchQueryChange(e.target.value)}
+                        placeholder="Search all scripts..."
+                        className="w-full bg-black/30 text-zinc-200 border border-white/10 rounded-md py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-all"
+                    />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
+                        <SearchIcon className="w-5 h-5" />
                     </div>
-                    <button
-                        type="submit"
-                        className="bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white font-semibold px-5 py-2.5 rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait flex items-center gap-2"
-                        disabled={isAISearching}
-                    >
-                        {isAISearching ? 'Thinking...' : 'AI Select'}
-                    </button>
-                </form>
+                </div>
             </div>
         </header>
     );

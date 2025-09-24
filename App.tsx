@@ -6,17 +6,16 @@ import { Footer } from './components/Footer';
 import { AddScriptModal } from './components/AddScriptModal';
 import { CATEGORIES, INITIAL_SCRIPTS } from './constants/data';
 import type { Script } from './types';
-import { getScriptsForQuery } from './services/geminiService';
+import { SearchIcon } from './components/icons/SearchIcon';
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [scripts, setScripts] = useState<Script[]>(INITIAL_SCRIPTS);
   const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0].id);
   const [selectedScripts, setSelectedScripts] = useState<Set<string>>(new Set());
-  const [isAISearching, setIsAISearching] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -25,9 +24,24 @@ export default function App() {
     }
   }, []);
 
-  const scriptsForCategory = useMemo(() => {
-    return scripts.filter(script => script.categoryId === selectedCategory);
-  }, [selectedCategory, scripts]);
+  const isSearching = searchQuery.trim().length > 0;
+
+  const displayedScripts = useMemo(() => {
+    const lowercasedQuery = searchQuery.toLowerCase().trim();
+    if (!lowercasedQuery) {
+      return scripts.filter(script => script.categoryId === selectedCategory);
+    }
+    return scripts.filter(
+      script =>
+        script.name.toLowerCase().includes(lowercasedQuery) ||
+        script.description.toLowerCase().includes(lowercasedQuery)
+    );
+  }, [searchQuery, scripts, selectedCategory]);
+  
+  const handleCategorySelect = useCallback((id: string) => {
+    setSelectedCategory(id);
+    setSearchQuery(''); // Clear search when a category is clicked
+  }, []);
 
   const handleScriptToggle = useCallback((scriptId: string) => {
     setSelectedScripts(prev => {
@@ -41,27 +55,27 @@ export default function App() {
     });
   }, []);
 
-  const handleSelectAllInCategory = useCallback(() => {
-    const categoryScriptIds = scriptsForCategory.map(s => s.id);
+  const handleSelectAllDisplayed = useCallback(() => {
+    const displayedScriptIds = displayedScripts.map(s => s.id);
     setSelectedScripts(prev => {
       const newSet = new Set(prev);
-      categoryScriptIds.forEach(id => newSet.add(id));
+      displayedScriptIds.forEach(id => newSet.add(id));
       return newSet;
     });
-  }, [scriptsForCategory]);
+  }, [displayedScripts]);
 
-  const handleDeselectAllInCategory = useCallback(() => {
-    const categoryScriptIds = new Set(scriptsForCategory.map(s => s.id));
+  const handleDeselectAllDisplayed = useCallback(() => {
+    const displayedScriptIds = new Set(displayedScripts.map(s => s.id));
     setSelectedScripts(prev => {
       const newSet = new Set(prev);
       newSet.forEach(id => {
-        if (categoryScriptIds.has(id)) {
+        if (displayedScriptIds.has(id)) {
           newSet.delete(id);
         }
       });
       return newSet;
     });
-  }, [scriptsForCategory]);
+  }, [displayedScripts]);
 
   const handleClearAll = useCallback(() => {
     setSelectedScripts(new Set());
@@ -101,25 +115,6 @@ ${Array.from(selectedScripts)
     URL.revokeObjectURL(url);
   }, [selectedScripts, scripts]);
 
-  const handleAISearch = useCallback(async (query: string) => {
-    if (!query) return;
-    setIsAISearching(true);
-    setAiError(null);
-    try {
-      const scriptIds = await getScriptsForQuery(query, scripts);
-      setSelectedScripts(prev => {
-        const newSet = new Set(prev);
-        scriptIds.forEach(id => newSet.add(id));
-        return newSet;
-      });
-    } catch (error) {
-      console.error("AI Search Failed:", error);
-      setAiError("AI search failed. Please try again.");
-    } finally {
-      setIsAISearching(false);
-    }
-  }, [scripts]);
-
   const handleAddNewScript = (newScript: Omit<Script, 'id'>) => {
     setScripts(prev => [
       ...prev,
@@ -158,12 +153,14 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2).repl
     URL.revokeObjectURL(url);
     setHasUnsavedChanges(false);
   }, [scripts]);
+  
+  const currentCategory = CATEGORIES.find(c => c.id === selectedCategory)!;
 
   return (
     <div className="min-h-screen w-full bg-[#0b0914] text-zinc-300 font-sans flex flex-col">
       <Header 
-        onAISearch={handleAISearch} 
-        isAISearching={isAISearching} 
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
         isAdmin={isAdmin}
         hasUnsavedChanges={hasUnsavedChanges}
         onExport={handleExportConfig}
@@ -172,21 +169,24 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2).repl
         <Sidebar
           categories={CATEGORIES}
           selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
+          onSelectCategory={handleCategorySelect}
+          isSearching={isSearching}
         />
         <div className="flex-1 flex flex-col overflow-hidden">
-          {aiError && <div className="bg-red-900/50 border border-red-700 text-red-300 text-center p-3 rounded-lg m-4">{aiError}</div>}
           <div className="flex-1 flex flex-col overflow-hidden bg-black/20 m-4 mt-0 rounded-xl border border-white/10 shadow-lg">
               <MainContent
-                key={selectedCategory}
-                category={CATEGORIES.find(c => c.id === selectedCategory)!}
-                scripts={scriptsForCategory}
+                key={isSearching ? 'search' : selectedCategory}
+                title={isSearching ? `Search Results` : currentCategory.name}
+                description={isSearching ? `${displayedScripts.length} script(s) found for "${searchQuery}"` : "Select scripts to add to your collection."}
+                icon={isSearching ? <SearchIcon className="w-7 h-7 text-cyan-400" /> : currentCategory.icon}
+                scripts={displayedScripts}
                 selectedScripts={selectedScripts}
                 onScriptToggle={handleScriptToggle}
-                onSelectAll={handleSelectAllInCategory}
-                onDeselectAll={handleDeselectAllInCategory}
+                onSelectAll={handleSelectAllDisplayed}
+                onDeselectAll={handleDeselectAllDisplayed}
                 isAdmin={isAdmin}
                 onAddScriptClick={() => setIsAddModalOpen(true)}
+                isSearching={isSearching}
               />
               <Footer
                 selectedCount={selectedScripts.size}
