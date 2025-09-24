@@ -10,8 +10,8 @@ interface CategoryNavProps {
 
 export const CategoryNav: React.FC<CategoryNavProps> = ({ categories, selectedCategory, onSelectCategory, isSearching }) => {
   return (
-    <div className="border-b border-zinc-800">
-        <nav className="container mx-auto flex items-center gap-2 px-4" aria-label="Categories">
+    <div className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm">
+        <nav className="flex items-center gap-2 px-4" aria-label="Categories">
             {categories.map(category => {
             const isSelected = !isSearching && selectedCategory === category.id;
             return (

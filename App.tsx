@@ -182,7 +182,7 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
     a.href = url;
     a.download = 'data.ts';
     document.body.appendChild(a);
-    a.click();
+a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     setHasUnsavedChanges(false);
@@ -191,7 +191,7 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
   const currentCategory = CATEGORIES.find(c => c.id === selectedCategory)!;
 
   return (
-    <div className="min-h-screen w-full bg-zinc-950 text-zinc-300 font-sans flex flex-col">
+    <div className="min-h-screen w-full bg-zinc-900 text-zinc-300 font-sans flex flex-col">
       <Header 
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
@@ -205,8 +205,8 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
           onSelectCategory={handleCategorySelect}
           isSearching={isSearching}
         />
-      <main className="flex-1 flex flex-col overflow-hidden container mx-auto px-4 w-full">
-          <div className="flex-1 flex flex-col overflow-hidden bg-zinc-900/50 my-4 rounded-xl border border-zinc-800 shadow-lg">
+      <main className="flex-1 flex flex-col overflow-hidden w-full">
+          <div className="flex-1 flex flex-col overflow-hidden">
               <MainContent
                 key={isSearching ? 'search' : selectedCategory}
                 title={isSearching ? `Search Results` : currentCategory.name}
@@ -246,7 +246,7 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
         href="https://github.com/xcode96"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 p-3 bg-zinc-900 border border-zinc-700 rounded-full text-zinc-400 hover:text-orange-500 hover:border-orange-500/50 transition-all duration-300 shadow-lg"
+        className="fixed bottom-6 right-6 z-50 p-3 bg-zinc-900/50 border border-zinc-700 rounded-full text-zinc-400 hover:text-orange-500 hover:border-orange-500/50 transition-all duration-300 shadow-lg backdrop-blur-sm"
         aria-label="View source on GitHub"
         title="View source on GitHub"
       >

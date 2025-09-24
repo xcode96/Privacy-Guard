@@ -32,17 +32,17 @@ export const ViewCodeModal: React.FC<ViewCodeModalProps> = ({ isOpen, onClose, s
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-zinc-900 rounded-xl border border-zinc-800 w-full max-w-3xl max-h-[80vh] flex flex-col shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-zinc-900 rounded-xl border border-zinc-700 w-full max-w-3xl max-h-[80vh] flex flex-col shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
         <div className="p-6 border-b border-zinc-800">
             <h2 className="text-xl font-bold text-white font-mono">{script.name}</h2>
             <p className="text-zinc-400 mt-1 text-sm">{script.description}</p>
         </div>
         <div className="p-6 flex-1 overflow-y-auto">
-            <pre className="bg-zinc-950 rounded p-4 text-sm text-zinc-300 font-mono whitespace-pre-wrap break-words">
+            <pre className="bg-zinc-950/70 rounded p-4 text-sm text-zinc-300 font-mono whitespace-pre-wrap break-words">
                 <code>{script.code}</code>
             </pre>
         </div>
-        <div className="p-4 bg-zinc-950/50 border-t border-zinc-800 flex justify-end">
+        <div className="p-4 bg-zinc-900/50 border-t border-zinc-800 flex justify-end">
             <button
                 onClick={handleCopyCode}
                 className="px-5 py-2 text-sm font-semibold text-white bg-orange-600 rounded-md hover:bg-orange-500 transition-all w-28"
