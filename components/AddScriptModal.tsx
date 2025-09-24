@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { Script, Category } from '../types';
 
 interface AddScriptModalProps {
@@ -27,6 +27,13 @@ export const AddScriptModal: React.FC<AddScriptModalProps> = ({ isOpen, onClose,
     setCode('');
     setCategoryId(categories[0]?.id || '');
   };
+
+  const codePlaceholder = useMemo(() => {
+    if (categoryId === 'win') {
+      return `REM Your batch script commands here...\r\necho "Hello from Batch!"`;
+    }
+    return `#!/bin/bash\n# Your shell script commands here...\necho "Hello from Shell!"`;
+  }, [categoryId]);
 
   if (!isOpen) return null;
 
@@ -66,7 +73,7 @@ export const AddScriptModal: React.FC<AddScriptModalProps> = ({ isOpen, onClose,
               onChange={(e) => setCode(e.target.value)}
               rows={6}
               className="w-full bg-black/30 text-zinc-200 border border-white/10 rounded-md p-2.5 font-mono text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none transition-all"
-              placeholder="#!/bin/bash&#10;echo 'Hello, World!'"
+              placeholder={codePlaceholder}
               required
             />
           </div>

@@ -82,37 +82,61 @@ export default function App() {
   }, []);
 
   const handleGenerateScript = useCallback(() => {
-    const header = `
-# Privacy Guard Script
+    const allSelectedScripts = Array.from(selectedScripts)
+      .map(id => scripts.find(s => s.id === id))
+      .filter((s): s is Script => s !== undefined);
+
+    const windowsScripts = allSelectedScripts.filter(s => s.categoryId === 'win');
+    const shellScripts = allSelectedScripts.filter(s => ['mac', 'linux', 'browser'].includes(s.categoryId));
+    
+    const downloadFile = (filename: string, content: string, useCRLF = false) => {
+      const finalContent = useCRLF ? content.replace(/\n/g, '\r\n') : content;
+      const blob = new Blob([finalContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    if (windowsScripts.length > 0) {
+        const header = `
+@echo off
+REM Privacy Guard Script (Windows)
+REM Generated on: ${new Date().toISOString()}
+REM
+REM This script contains the following privacy enhancements:
+${windowsScripts.map(s => `REM - ${s.name}`).join('\n')}
+REM ----------------------------------------------------
+
+`;
+        const scriptContent = windowsScripts
+            .map(script => `\nREM --- ${script.name} ---\n${script.code}`)
+            .join('\n');
+        
+        downloadFile('privacy-guard-script.bat', header + scriptContent, true);
+    }
+
+    if (shellScripts.length > 0) {
+        const header = `
+#!/bin/bash
+# Privacy Guard Script (Shell)
 # Generated on: ${new Date().toISOString()}
 #
 # This script contains the following privacy enhancements:
-${Array.from(selectedScripts)
-  .map(id => scripts.find(s => s.id === id))
-  .filter(Boolean)
-  .map(s => `# - ${s!.name}`)
-  .join('\n')}
+${shellScripts.map(s => `# - ${s.name}`).join('\n')}
 # ----------------------------------------------------
 
 `;
-    const scriptContent = Array.from(selectedScripts)
-      .map(id => {
-        const script = scripts.find(s => s.id === id);
-        return script ? `\n# --- ${script.name} ---\n${script.code}` : '';
-      })
-      .join('\n');
-    
-    const fullScript = header + scriptContent;
-
-    const blob = new Blob([fullScript], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'privacy-guard-script.sh';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+        const scriptContent = shellScripts
+            .map(script => `\n# --- ${script.name} ---\n${script.code}`)
+            .join('\n');
+        
+        downloadFile('privacy-guard-script.sh', header + scriptContent);
+    }
   }, [selectedScripts, scripts]);
 
   const handleAddNewScript = (newScript: Omit<Script, 'id'>) => {
