@@ -8,6 +8,7 @@ import { AddScriptModal } from './components/AddScriptModal';
 import { CATEGORIES, INITIAL_SCRIPTS, SUB_CATEGORIES } from './constants/data';
 import type { Script } from './types';
 import { SearchIcon } from './components/icons/SearchIcon';
+import { GitHubIcon } from './components/icons/GitHubIcon';
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -226,6 +227,16 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
         categories={CATEGORIES}
         subCategories={SUB_CATEGORIES}
       />
+      <a
+        href="https://github.com/xcode96"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 p-3 bg-white/10 border border-white/20 rounded-full text-zinc-300 hover:text-white hover:bg-white/20 transition-all duration-300 shadow-lg backdrop-blur-sm"
+        aria-label="View source on GitHub"
+        title="View source on GitHub"
+      >
+        <GitHubIcon className="w-6 h-6" />
+      </a>
     </div>
   );
 }
