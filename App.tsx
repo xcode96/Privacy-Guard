@@ -1,10 +1,11 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
+import { CategoryNav } from './components/CategoryNav';
 import { MainContent } from './components/MainContent';
 import { Footer } from './components/Footer';
 import { AddScriptModal } from './components/AddScriptModal';
+import { ViewCodeModal } from './components/ViewCodeModal';
 import { CATEGORIES, INITIAL_SCRIPTS, SUB_CATEGORIES } from './constants/data';
 import type { Script } from './types';
 import { SearchIcon } from './components/icons/SearchIcon';
@@ -16,6 +17,8 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0].id);
   const [selectedScripts, setSelectedScripts] = useState<Set<string>>(new Set());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [scriptToView, setScriptToView] = useState<Script | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -82,6 +85,14 @@ export default function App() {
   const handleClearAll = useCallback(() => {
     setSelectedScripts(new Set());
   }, []);
+  
+  const handleViewCode = useCallback((scriptId: string) => {
+    const script = scripts.find(s => s.id === scriptId);
+    if (script) {
+        setScriptToView(script);
+        setIsViewModalOpen(true);
+    }
+  }, [scripts]);
 
   const handleGenerateScript = useCallback(() => {
     const allSelectedScripts = Array.from(selectedScripts)
@@ -92,7 +103,7 @@ export default function App() {
     const shellScripts = allSelectedScripts.filter(s => ['mac', 'linux', 'browser'].includes(s.categoryId));
     
     const downloadFile = (filename: string, content: string, useCRLF = false) => {
-      const finalContent = useCRLF ? content.replace(/\n/g, '\r\n') : content;
+      const finalContent = useCRLF ? content.replace(/\\n/g, '\\r\\n') : content;
       const blob = new Blob([finalContent], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -111,13 +122,13 @@ REM Privacy Guard Script (Windows)
 REM Generated on: ${new Date().toISOString()}
 REM
 REM This script contains the following privacy enhancements:
-${windowsScripts.map(s => `REM - ${s.name}`).join('\n')}
+${windowsScripts.map(s => `REM - ${s.name}`).join('\\r\\n')}
 REM ----------------------------------------------------
 
 `;
         const scriptContent = windowsScripts
             .map(script => `\nREM --- ${script.name} ---\n${script.code}`)
-            .join('\n');
+            .join('\\n');
         
         downloadFile('privacy-guard-script.bat', header + scriptContent, true);
     }
@@ -129,13 +140,13 @@ REM ----------------------------------------------------
 # Generated on: ${new Date().toISOString()}
 #
 # This script contains the following privacy enhancements:
-${shellScripts.map(s => `# - ${s.name}`).join('\n')}
+${shellScripts.map(s => `# - ${s.name}`).join('\\n')}
 # ----------------------------------------------------
 
 `;
         const scriptContent = shellScripts
             .map(script => `\n# --- ${script.name} ---\n${script.code}`)
-            .join('\n');
+            .join('\\n');
         
         downloadFile('privacy-guard-script.sh', header + scriptContent);
     }
@@ -180,7 +191,7 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
   const currentCategory = CATEGORIES.find(c => c.id === selectedCategory)!;
 
   return (
-    <div className="min-h-screen w-full bg-[#0b0914] text-zinc-300 font-sans flex flex-col">
+    <div className="min-h-screen w-full bg-zinc-950 text-zinc-300 font-sans flex flex-col">
       <Header 
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
@@ -188,23 +199,23 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
         hasUnsavedChanges={hasUnsavedChanges}
         onExport={handleExportConfig}
       />
-      <main className="flex-1 flex overflow-hidden">
-        <Sidebar
+       <CategoryNav
           categories={CATEGORIES}
           selectedCategory={selectedCategory}
           onSelectCategory={handleCategorySelect}
           isSearching={isSearching}
         />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 flex flex-col overflow-hidden bg-black/20 m-4 mt-0 rounded-xl border border-white/10 shadow-lg">
+      <main className="flex-1 flex flex-col overflow-hidden container mx-auto px-4 w-full">
+          <div className="flex-1 flex flex-col overflow-hidden bg-zinc-900/50 my-4 rounded-xl border border-zinc-800 shadow-lg">
               <MainContent
                 key={isSearching ? 'search' : selectedCategory}
                 title={isSearching ? `Search Results` : currentCategory.name}
                 description={isSearching ? `${displayedScripts.length} script(s) found for "${searchQuery}"` : "Select scripts to add to your collection."}
-                icon={isSearching ? <SearchIcon className="w-7 h-7 text-cyan-400" /> : currentCategory.icon}
+                icon={isSearching ? <SearchIcon className="w-7 h-7 text-orange-500" /> : currentCategory.icon}
                 scripts={displayedScripts}
                 selectedScripts={selectedScripts}
                 onScriptToggle={handleScriptToggle}
+                onViewCode={handleViewCode}
                 onSelectAll={handleSelectAllDisplayed}
                 onDeselectAll={handleDeselectAllDisplayed}
                 isAdmin={isAdmin}
@@ -218,7 +229,6 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
                 onGenerateScript={handleGenerateScript}
               />
           </div>
-        </div>
       </main>
       <AddScriptModal
         isOpen={isAddModalOpen}
@@ -227,11 +237,16 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
         categories={CATEGORIES}
         subCategories={SUB_CATEGORIES}
       />
+      <ViewCodeModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        script={scriptToView}
+      />
       <a
         href="https://github.com/xcode96"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 p-3 bg-white/10 border border-white/20 rounded-full text-zinc-300 hover:text-white hover:bg-white/20 transition-all duration-300 shadow-lg backdrop-blur-sm"
+        className="fixed bottom-6 right-6 z-50 p-3 bg-zinc-900 border border-zinc-700 rounded-full text-zinc-400 hover:text-orange-500 hover:border-orange-500/50 transition-all duration-300 shadow-lg"
         aria-label="View source on GitHub"
         title="View source on GitHub"
       >

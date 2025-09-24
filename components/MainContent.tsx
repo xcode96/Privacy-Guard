@@ -12,6 +12,7 @@ interface MainContentProps {
   scripts: Script[];
   selectedScripts: Set<string>;
   onScriptToggle: (id: string) => void;
+  onViewCode: (id: string) => void;
   onSelectAll: () => void;
   onDeselectAll: () => void;
   isAdmin: boolean;
@@ -20,8 +21,7 @@ interface MainContentProps {
   subCategories: SubCategory[];
 }
 
-// FIX: Destructure subCategories from props to resolve reference errors.
-export const MainContent: React.FC<MainContentProps> = ({ title, description, icon, scripts, selectedScripts, onScriptToggle, onSelectAll, onDeselectAll, isAdmin, onAddScriptClick, isSearching, subCategories }) => {
+export const MainContent: React.FC<MainContentProps> = ({ title, description, icon, scripts, selectedScripts, onScriptToggle, onViewCode, onSelectAll, onDeselectAll, isAdmin, onAddScriptClick, isSearching, subCategories }) => {
 
   const currentCategoryId = scripts[0]?.categoryId;
   const categorySubCategories = useMemo(() => 
@@ -36,7 +36,7 @@ export const MainContent: React.FC<MainContentProps> = ({ title, description, ic
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div>
                 <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    {React.cloneElement(icon as React.ReactElement<React.SVGProps<SVGSVGElement>>, { className: "w-7 h-7 text-cyan-400" })}
+                    {React.cloneElement(icon as React.ReactElement<React.SVGProps<SVGSVGElement>>, { className: "w-7 h-7 text-orange-500" })}
                     <span>{title}</span>
                 </h2>
                 <p className="text-zinc-400 mt-1">{description}</p>
@@ -45,20 +45,20 @@ export const MainContent: React.FC<MainContentProps> = ({ title, description, ic
                 {isAdmin && !isSearching && (
                   <button
                     onClick={onAddScriptClick}
-                    className="px-4 py-1.5 text-sm font-semibold text-white bg-gradient-to-r from-cyan-600 to-fuchsia-600 rounded-md hover:opacity-90 transition-opacity"
+                    className="px-4 py-1.5 text-sm font-semibold text-white bg-orange-600 rounded-md hover:bg-orange-500 transition-colors"
                   >
                     Add Script
                   </button>
                 )}
                 <button 
                   onClick={onSelectAll}
-                  className="px-4 py-1.5 text-sm font-medium text-zinc-300 bg-white/5 border border-white/10 rounded-md hover:bg-white/10"
+                  className="px-4 py-1.5 text-sm font-medium text-zinc-300 bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700"
                 >
                   Select All
                 </button>
                 <button 
                   onClick={onDeselectAll}
-                  className="px-4 py-1.5 text-sm font-medium text-zinc-300 bg-white/5 border border-white/10 rounded-md hover:bg-white/10"
+                  className="px-4 py-1.5 text-sm font-medium text-zinc-300 bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700"
                 >
                   Deselect All
                 </button>
@@ -77,6 +77,7 @@ export const MainContent: React.FC<MainContentProps> = ({ title, description, ic
                         scripts={subCategoryScripts}
                         selectedScripts={selectedScripts}
                         onScriptToggle={onScriptToggle}
+                        onViewCode={onViewCode}
                     />
                 );
             })}
@@ -89,6 +90,7 @@ export const MainContent: React.FC<MainContentProps> = ({ title, description, ic
                 script={script}
                 isSelected={selectedScripts.has(script.id)}
                 onToggle={onScriptToggle}
+                onViewCode={onViewCode}
             />
             ))}
         </div>

@@ -1,30 +1,26 @@
 import React from 'react';
 import type { Script } from '../types';
+import { EyeIcon } from './icons/EyeIcon';
 
 interface ScriptItemProps {
   script: Script;
   isSelected: boolean;
   onToggle: (id: string) => void;
+  onViewCode: (id: string) => void;
 }
 
-const CheckboxIcon = ({ isSelected }: { isSelected: boolean }) => (
-  <div className={`w-5 h-5 rounded-md flex items-center justify-center border-2 transition-all duration-200 flex-shrink-0 ${isSelected ? 'bg-cyan-400 border-cyan-400' : 'bg-black/20 border-white/20 group-hover:border-white/40'}`}>
-    {isSelected && (
-      <svg className="w-3.5 h-3.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-      </svg>
-    )}
-  </div>
-);
-
-
-export const ScriptItem: React.FC<ScriptItemProps> = ({ script, isSelected, onToggle }) => {
+export const ScriptItem: React.FC<ScriptItemProps> = ({ script, isSelected, onToggle, onViewCode }) => {
   const codePreview = script.code.split('\n').slice(0, 3).join('\n');
   
+  const handleViewClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onViewCode(script.id);
+  }
+
   return (
     <div
-      className={`group bg-white/5 rounded-lg p-4 border border-transparent transition-all duration-200 cursor-pointer relative overflow-hidden backdrop-blur-sm
-      ${ isSelected ? 'border-fuchsia-500/50' : 'hover:bg-white/10' }
+      className={`group bg-zinc-900 rounded-lg p-4 border border-zinc-800 transition-all duration-200 cursor-pointer relative overflow-hidden
+      ${ isSelected ? 'border-orange-500/50' : 'hover:border-zinc-700' }
       `}
       onClick={() => onToggle(script.id)}
       role="checkbox"
@@ -32,20 +28,24 @@ export const ScriptItem: React.FC<ScriptItemProps> = ({ script, isSelected, onTo
       tabIndex={0}
       onKeyDown={(e) => (e.key === ' ' || e.key === 'Enter') && onToggle(script.id)}
     >
-        <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${isSelected ? 'opacity-100' : 'opacity-0'}`}
-             style={{
-                 background: 'radial-gradient(circle at top left, rgba(0, 255, 255, 0.2), transparent 40%), radial-gradient(circle at bottom right, rgba(255, 0, 255, 0.2), transparent 40%)'
-             }}
-        />
-      <div className="flex items-start gap-4 relative z-10">
-        <CheckboxIcon isSelected={isSelected} />
+      <div className={`absolute left-0 top-0 h-full w-1 bg-orange-500 transition-transform duration-300 ${isSelected ? 'scale-y-100' : 'scale-y-0'}`} />
+        
+      <div className="flex items-start gap-4">
         <div className="flex-1">
-          <h3 className="font-semibold text-white font-mono">{script.name}</h3>
+          <h3 className="font-semibold text-zinc-100 font-mono">{script.name}</h3>
           <p className="text-zinc-400 text-sm mt-1">{script.description}</p>
         </div>
+        <button
+          onClick={handleViewClick}
+          className="p-2 rounded-md bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700 hover:text-white transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+          aria-label={`View code for ${script.name}`}
+          title={`View code for ${script.name}`}
+        >
+          <EyeIcon className="w-5 h-5" />
+        </button>
       </div>
-      <div className="mt-4 pl-9 relative z-10">
-        <pre className="bg-black/30 rounded p-2 text-xs text-zinc-500 font-mono overflow-x-auto">
+      <div className="mt-4">
+        <pre className="bg-zinc-950 rounded p-2 text-xs text-zinc-500 font-mono overflow-x-auto">
           <code>{codePreview}{script.code.split('\n').length > 3 ? '\n...' : ''}</code>
         </pre>
       </div>

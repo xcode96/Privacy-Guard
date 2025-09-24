@@ -9,13 +9,14 @@ interface SubCategoryGroupProps {
     scripts: Script[];
     selectedScripts: Set<string>;
     onScriptToggle: (id: string) => void;
+    onViewCode: (id: string) => void;
 }
 
-export const SubCategoryGroup: React.FC<SubCategoryGroupProps> = ({ title, scripts, selectedScripts, onScriptToggle }) => {
+export const SubCategoryGroup: React.FC<SubCategoryGroupProps> = ({ title, scripts, selectedScripts, onScriptToggle, onViewCode }) => {
     const [isOpen, setIsOpen] = useState(true);
 
     return (
-        <div className="bg-black/20 rounded-lg border border-white/10">
+        <div className="bg-zinc-900/70 rounded-lg border border-zinc-800">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full flex justify-between items-center p-4 text-left"
@@ -33,6 +34,7 @@ export const SubCategoryGroup: React.FC<SubCategoryGroupProps> = ({ title, scrip
                                 script={script}
                                 isSelected={selectedScripts.has(script.id)}
                                 onToggle={onScriptToggle}
+                                onViewCode={onViewCode}
                             />
                         ))}
                     </div>

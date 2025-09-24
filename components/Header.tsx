@@ -13,13 +13,13 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchQueryChange, isAdmin, hasUnsavedChanges, onExport }) => {
     return (
-        <header className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 border-b border-white/10 bg-black/20 backdrop-blur-lg sticky top-0 z-40">
+        <header className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-lg sticky top-0 z-40 container mx-auto">
             <div className="flex items-center gap-3">
-                <ShieldIcon className="w-8 h-8 text-cyan-300" />
+                <ShieldIcon className="w-8 h-8 text-orange-500" />
                 <div>
                     <div className="flex items-center gap-3">
-                        <h1 className="text-2xl font-bold text-white">Privacy Guard</h1>
-                        {isAdmin && <span className="text-xs font-bold text-cyan-300 bg-cyan-900/50 px-2 py-1 rounded-full">ADMIN</span>}
+                        <h1 className="text-2xl font-bold text-zinc-100">Privacy Guard</h1>
+                        {isAdmin && <span className="text-xs font-bold text-orange-400 bg-orange-900/50 px-2 py-1 rounded-full">ADMIN</span>}
                     </div>
                     <p className="text-md text-zinc-400">Generate privacy-enhancing scripts.</p>
                 </div>
@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchQueryChange
                 {isAdmin && hasUnsavedChanges && (
                     <button
                         onClick={onExport}
-                        className="bg-purple-600 text-white font-semibold px-4 py-2.5 rounded-md hover:bg-purple-500 transition-colors flex items-center gap-2 animate-pulse"
+                        className="bg-orange-600 text-white font-semibold px-4 py-2.5 rounded-md hover:bg-orange-500 transition-colors flex items-center gap-2 animate-pulse"
                         title="Download updated data.ts file"
                     >
                         <DownloadIcon className="w-5 h-5" />
@@ -41,9 +41,9 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchQueryChange
                         value={searchQuery}
                         onChange={(e) => onSearchQueryChange(e.target.value)}
                         placeholder="Search all scripts..."
-                        className="w-full bg-black/30 text-zinc-200 border border-white/10 rounded-md py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-all"
+                        className="w-full bg-zinc-900 text-zinc-200 border border-zinc-700 rounded-md py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-orange-500 focus:outline-none transition-all"
                     />
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
                         <SearchIcon className="w-5 h-5" />
                     </div>
                 </div>
