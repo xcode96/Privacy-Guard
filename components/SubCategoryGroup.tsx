@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import type { Script } from '../types';
 import { ScriptItem } from './ScriptItem';
@@ -13,7 +12,7 @@ interface SubCategoryGroupProps {
 }
 
 export const SubCategoryGroup: React.FC<SubCategoryGroupProps> = ({ title, scripts, selectedScripts, onScriptToggle, onViewCode }) => {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <div className="bg-zinc-800/40 rounded-lg border border-zinc-700/80">
