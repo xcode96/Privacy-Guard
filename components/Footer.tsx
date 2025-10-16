@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface FooterProps {
@@ -8,7 +9,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ selectedCount, onClearAll, onGenerateScript }) => {
   return (
-    <footer className="bg-zinc-900/80 border-t border-zinc-800 p-4 mt-auto backdrop-blur-lg sticky bottom-0 z-30">
+    <footer className="bg-zinc-900 border-t border-zinc-800 p-4">
       <div className="flex justify-between items-center max-w-7xl mx-auto">
         <div>
           <span className="font-bold text-white text-lg">{selectedCount}</span>

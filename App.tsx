@@ -269,7 +269,7 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
   const currentCategory = CATEGORIES.find(c => c.id === selectedCategory)!;
 
   return (
-    <div className="min-h-screen w-full bg-zinc-900 text-zinc-300 font-sans flex flex-col">
+    <div className="h-screen w-full bg-zinc-900 text-zinc-300 font-sans flex flex-col">
       <Header 
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
@@ -285,30 +285,28 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
           isSearching={isSearching}
         />
       <main className="flex-1 flex flex-col overflow-hidden w-full">
-          <div className="flex-1 flex flex-col overflow-hidden">
-              <MainContent
-                key={isSearching ? 'search' : selectedCategory}
-                title={isSearching ? `Search Results` : currentCategory.name}
-                description={isSearching ? `${displayedScripts.length} script(s) found for "${searchQuery}"` : "Select scripts to add to your collection."}
-                icon={isSearching ? <SearchIcon className="w-7 h-7 text-orange-500" /> : currentCategory.icon}
-                scripts={displayedScripts}
-                selectedScripts={selectedScripts}
-                onScriptToggle={handleScriptToggle}
-                onViewCode={handleViewCode}
-                onSelectAll={handleSelectAllDisplayed}
-                onDeselectAll={handleDeselectAllDisplayed}
-                isAdmin={isAdmin}
-                onAddScriptClick={() => setIsAddModalOpen(true)}
-                isSearching={isSearching}
-                subCategories={SUB_CATEGORIES}
-              />
-              <Footer
-                selectedCount={selectedScripts.size}
-                onClearAll={handleClearAll}
-                onGenerateScript={handleGenerateScript}
-              />
-          </div>
+          <MainContent
+            key={isSearching ? 'search' : selectedCategory}
+            title={isSearching ? `Search Results` : currentCategory.name}
+            description={isSearching ? `${displayedScripts.length} script(s) found for "${searchQuery}"` : "Select scripts to add to your collection."}
+            icon={isSearching ? <SearchIcon className="w-7 h-7 text-orange-500" /> : currentCategory.icon}
+            scripts={displayedScripts}
+            selectedScripts={selectedScripts}
+            onScriptToggle={handleScriptToggle}
+            onViewCode={handleViewCode}
+            onSelectAll={handleSelectAllDisplayed}
+            onDeselectAll={handleDeselectAllDisplayed}
+            isAdmin={isAdmin}
+            onAddScriptClick={() => setIsAddModalOpen(true)}
+            isSearching={isSearching}
+            subCategories={SUB_CATEGORIES}
+          />
       </main>
+      <Footer
+        selectedCount={selectedScripts.size}
+        onClearAll={handleClearAll}
+        onGenerateScript={handleGenerateScript}
+      />
       <AddScriptModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
