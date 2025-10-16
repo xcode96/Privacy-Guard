@@ -6,10 +6,18 @@ import { MainContent } from './components/MainContent';
 import { Footer } from './components/Footer';
 import { AddScriptModal } from './components/AddScriptModal';
 import { ViewCodeModal } from './components/ViewCodeModal';
+import { GitHubPublishModal } from './components/GitHubPublishModal';
 import { CATEGORIES, INITIAL_SCRIPTS, SUB_CATEGORIES } from './constants/data';
 import type { Script } from './types';
 import { SearchIcon } from './components/icons/SearchIcon';
 import { GitHubIcon } from './components/icons/GitHubIcon';
+
+interface GitHubSettings {
+  repoOwner: string;
+  repoName: string;
+  filePath: string;
+  pat: string;
+}
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -18,9 +26,11 @@ export default function App() {
   const [selectedScripts, setSelectedScripts] = useState<Set<string>>(new Set());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [scriptToView, setScriptToView] = useState<Script | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [publisherStatus, setPublisherStatus] = useState<'idle' | 'publishing' | 'success' | 'error'>('idle');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -161,7 +171,20 @@ ${shellScripts.map(s => `# - ${s.name}`).join('\\n')}
     setIsAddModalOpen(false);
   };
 
-  const handleExportConfig = useCallback(() => {
+  const handlePublishToGitHub = useCallback(async () => {
+    const settingsString = localStorage.getItem('githubPublishSettings');
+    if (!settingsString) {
+      setIsPublishModalOpen(true);
+      return;
+    }
+    const settings: GitHubSettings = JSON.parse(settingsString);
+    if (!settings.pat || !settings.repoOwner || !settings.repoName || !settings.filePath) {
+      setIsPublishModalOpen(true);
+      return;
+    }
+
+    setPublisherStatus('publishing');
+
     const fileContent = `
 import React from 'react';
 import type { Category, Script, SubCategory } from '../types';
@@ -175,18 +198,73 @@ export const CATEGORIES: Category[] = ${JSON.stringify(CATEGORIES, null, 2).repl
 export const SUB_CATEGORIES: SubCategory[] = ${JSON.stringify(SUB_CATEGORIES, null, 2)};
 
 export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
-`;
-    const blob = new Blob([fileContent.trim()], { type: 'application/typescript' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'data.ts';
-    document.body.appendChild(a);
-a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    setHasUnsavedChanges(false);
+`.trim();
+    
+    // btoa can fail on Unicode characters, so we need to encode them first.
+    const encodedContent = btoa(unescape(encodeURIComponent(fileContent)));
+
+    const url = `https://api.github.com/repos/${settings.repoOwner}/${settings.repoName}/contents/${settings.filePath}`;
+    
+    try {
+      // 1. Get the file to get its SHA (for updates)
+      let sha: string | undefined;
+      const getFileResponse = await fetch(url, {
+        headers: {
+          Authorization: `token ${settings.pat}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      });
+
+      if (getFileResponse.ok) {
+        const fileData = await getFileResponse.json();
+        sha = fileData.sha;
+      } else if (getFileResponse.status !== 404) {
+        const errorData = await getFileResponse.json();
+        throw new Error(`Failed to fetch file: ${errorData.message || getFileResponse.statusText}`);
+      }
+      
+      // 2. Create or update the file
+      const updateResponse = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${settings.pat}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `Update scripts data - ${new Date().toISOString()}`,
+          content: encodedContent,
+          sha: sha, // Include SHA if updating, otherwise it's undefined for new file
+        }),
+      });
+
+      if (!updateResponse.ok) {
+        const errorData = await updateResponse.json();
+        throw new Error(`GitHub API error: ${errorData.message || updateResponse.statusText}`);
+      }
+
+      setPublisherStatus('success');
+      setHasUnsavedChanges(false);
+      setTimeout(() => setPublisherStatus('idle'), 3000);
+
+    } catch (error) {
+      console.error('Failed to publish to GitHub:', error);
+      setPublisherStatus('error');
+      alert(`Failed to publish to GitHub. Check console for details. Error: ${error instanceof Error ? error.message : String(error)}`);
+      setTimeout(() => setPublisherStatus('idle'), 5000);
+    }
   }, [scripts]);
+
+  const handleSavePublishSettings = (settings: GitHubSettings) => {
+    localStorage.setItem('githubPublishSettings', JSON.stringify(settings));
+    setIsPublishModalOpen(false);
+    if (hasUnsavedChanges) {
+        // Use a short timeout to allow the modal to close visually first
+        setTimeout(() => {
+            handlePublishToGitHub();
+        }, 100);
+    }
+  };
   
   const currentCategory = CATEGORIES.find(c => c.id === selectedCategory)!;
 
@@ -197,7 +275,8 @@ a.click();
         onSearchQueryChange={setSearchQuery}
         isAdmin={isAdmin}
         hasUnsavedChanges={hasUnsavedChanges}
-        onExport={handleExportConfig}
+        onPublish={handlePublishToGitHub}
+        publisherStatus={publisherStatus}
       />
        <CategoryNav
           categories={CATEGORIES}
@@ -241,6 +320,11 @@ a.click();
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         script={scriptToView}
+      />
+      <GitHubPublishModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        onSave={handleSavePublishSettings}
       />
       <a
         href="https://github.com/xcode96"
