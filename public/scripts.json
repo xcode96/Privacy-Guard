@@ -1204,5 +1204,12 @@
     "name": "Disable WebRTC IP Leak",
     "description": "Suggests using an extension like uBlock Origin to prevent IP address leaks via WebRTC.",
     "code": "\n# Action required: Install a browser extension like uBlock Origin or WebRTC Leak Prevent.\n# In uBlock Origin settings, check \"Prevent WebRTC from leaking local IP addresses.\"\necho \"Install a browser extension to prevent WebRTC leaks.\"\n    "
+  },
+  {
+    "name": "Privacy Guard",
+    "description": "zc",
+    "code": "sdCZ",
+    "categoryId": "browser",
+    "id": "custom-1761753054301"
   }
 ]
