@@ -1354,5 +1354,13 @@ export const INITIAL_SCRIPTS: Script[] = [
     "categoryId": "win",
     "subCategoryId": "win-ui-for-privacy",
     "id": "custom-1761751948383"
+  },
+  {
+    "name": "TOOLS BOOKS",
+    "description": "z",
+    "code": "z",
+    "categoryId": "linux",
+    "subCategoryId": "linux-privacy-cleanup",
+    "id": "custom-1761752109504"
   }
 ];
