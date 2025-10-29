@@ -1345,5 +1345,12 @@ export const INITIAL_SCRIPTS: Script[] = [
     "code": "constants",
     "categoryId": "browser",
     "id": "custom-1761752246957"
+  },
+  {
+    "name": "s",
+    "description": "s",
+    "code": "s",
+    "categoryId": "browser",
+    "id": "custom-1761752319560"
   }
 ];
