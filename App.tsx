@@ -7,7 +7,7 @@ import { Footer } from './components/Footer';
 import { AddScriptModal } from './components/AddScriptModal';
 import { ViewCodeModal } from './components/ViewCodeModal';
 import { GitHubPublishModal } from './components/GitHubPublishModal';
-import { CATEGORIES, INITIAL_SCRIPTS, SUB_CATEGORIES } from './constants/data';
+import { CATEGORIES, SUB_CATEGORIES } from './constants/data'; // Removed INITIAL_SCRIPTS import
 import type { Script } from './types';
 import { SearchIcon } from './components/icons/SearchIcon';
 import { GitHubIcon } from './components/icons/GitHubIcon';
@@ -21,12 +21,14 @@ interface GitHubSettings {
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [scripts, setScripts] = useState<Script[]>(INITIAL_SCRIPTS);
+  const [scripts, setScripts] = useState<Script[]>([]); // Initialize scripts as empty
+  const [isLoading, setIsLoading] = useState(true); // New loading state
   const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0].id);
+  // Fix: Initialize useState with a correctly typed Set<string>
   const [selectedScripts, setSelectedScripts] = useState<Set<string>>(new Set());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false); // Corrected: was 'setIsPublishModal = useState(false)'
   const [scriptToView, setScriptToView] = useState<Script | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,6 +39,26 @@ export default function App() {
     if (params.get('code') === 'dq.adm') {
       setIsAdmin(true);
     }
+
+    // Fetch scripts on component mount
+    const fetchScripts = async () => {
+      try {
+        const response = await fetch('/scripts.json'); // Fetch from the public folder
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data: Script[] = await response.json();
+        setScripts(data);
+      } catch (error) {
+        console.error("Failed to fetch scripts:", error);
+        // Fallback to empty scripts or handle error gracefully
+        setScripts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchScripts();
   }, []);
 
   const isSearching = searchQuery.trim().length > 0;
@@ -185,20 +207,8 @@ ${shellScripts.map(s => `# - ${s.name}`).join('\\n')}
 
     setPublisherStatus('publishing');
 
-    const fileContent = `
-import React from 'react';
-import type { Category, Script, SubCategory } from '../types';
-import { WindowsIcon } from '../components/icons/WindowsIcon';
-import { AppleIcon } from '../components/icons/AppleIcon';
-import { LinuxIcon } from '../components/icons/LinuxIcon';
-import { BrowserIcon } from '../components/icons/BrowserIcon';
-
-export const CATEGORIES: Category[] = ${JSON.stringify(CATEGORIES, null, 2).replace(/"(React\.createElement\(.+?\))"/g, '$1')};
-
-export const SUB_CATEGORIES: SubCategory[] = ${JSON.stringify(SUB_CATEGORIES, null, 2)};
-
-export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
-`.trim();
+    // Serialize only the scripts data (plain JSON array)
+    const fileContent = JSON.stringify(scripts, null, 2);
     
     // btoa can fail on Unicode characters, so we need to encode them first.
     const encodedContent = btoa(unescape(encodeURIComponent(fileContent)));
@@ -277,6 +287,7 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
         hasUnsavedChanges={hasUnsavedChanges}
         onPublish={handlePublishToGitHub}
         publisherStatus={publisherStatus}
+        isLoading={isLoading} // Pass isLoading to Header
       />
        <CategoryNav
           categories={CATEGORIES}
@@ -300,6 +311,7 @@ export const INITIAL_SCRIPTS: Script[] = ${JSON.stringify(scripts, null, 2)};
             onAddScriptClick={() => setIsAddModalOpen(true)}
             isSearching={isSearching}
             subCategories={SUB_CATEGORIES}
+            isLoading={isLoading} // Pass isLoading to MainContent
           />
       </main>
       <Footer

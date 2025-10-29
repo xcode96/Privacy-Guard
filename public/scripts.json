@@ -1,145 +1,11 @@
-import React from 'react';
-import type { Category, Script, SubCategory } from '../types';
-import { WindowsIcon } from '../components/icons/WindowsIcon';
-import { AppleIcon } from '../components/icons/AppleIcon';
-import { LinuxIcon } from '../components/icons/LinuxIcon';
-import { BrowserIcon } from '../components/icons/BrowserIcon';
-
-export const CATEGORIES: Category[] = [
-  {
-    "id": "win",
-    "name": "Windows",
-    "icon": {
-      "key": null,
-      "ref": null,
-      "props": {}
-    }
-  },
-  {
-    "id": "mac",
-    "name": "macOS",
-    "icon": {
-      "key": null,
-      "ref": null,
-      "props": {}
-    }
-  },
-  {
-    "id": "linux",
-    "name": "Linux",
-    "icon": {
-      "key": null,
-      "ref": null,
-      "props": {}
-    }
-  },
-  {
-    "id": "browser",
-    "name": "Browsers",
-    "icon": {
-      "key": null,
-      "ref": null,
-      "props": {}
-    }
-  }
-];
-
-export const SUB_CATEGORIES: SubCategory[] = [
-  {
-    "id": "win-privacy-cleanup",
-    "name": "Privacy Cleanup",
-    "categoryId": "win"
-  },
-  {
-    "id": "win-disable-os-data-collection",
-    "name": "Disable OS Data Collection",
-    "categoryId": "win"
-  },
-  {
-    "id": "win-configure-programs",
-    "name": "Configure Programs",
-    "categoryId": "win"
-  },
-  {
-    "id": "win-security-improvements",
-    "name": "Security Improvements",
-    "categoryId": "win"
-  },
-  {
-    "id": "win-block-tracking-hosts",
-    "name": "Block Tracking Hosts",
-    "categoryId": "win"
-  },
-  {
-    "id": "win-privacy-over-security",
-    "name": "Privacy Over Security",
-    "categoryId": "win"
-  },
-  {
-    "id": "win-ui-for-privacy",
-    "name": "UI for Privacy",
-    "categoryId": "win"
-  },
-  {
-    "id": "win-remove-bloatware",
-    "name": "Remove Bloatware",
-    "categoryId": "win"
-  },
-  {
-    "id": "win-advanced-settings",
-    "name": "Advanced Settings",
-    "categoryId": "win"
-  },
-  {
-    "id": "mac-privacy-cleanup",
-    "name": "Privacy Cleanup",
-    "categoryId": "mac"
-  },
-  {
-    "id": "mac-configure-programs",
-    "name": "Configure Programs",
-    "categoryId": "mac"
-  },
-  {
-    "id": "mac-configure-os",
-    "name": "Configure OS",
-    "categoryId": "mac"
-  },
-  {
-    "id": "mac-security-improvements",
-    "name": "Security Improvements",
-    "categoryId": "mac"
-  },
-  {
-    "id": "mac-privacy-over-security",
-    "name": "Privacy Over Security",
-    "categoryId": "mac"
-  },
-  {
-    "id": "linux-privacy-cleanup",
-    "name": "Privacy Cleanup",
-    "categoryId": "linux"
-  },
-  {
-    "id": "linux-disable-os-data-collection",
-    "name": "Disable OS Data Collection",
-    "categoryId": "linux"
-  },
-  {
-    "id": "linux-configure-programs",
-    "name": "Configure Programs",
-    "categoryId": "linux"
-  }
-];
-
-export const INITIAL_SCRIPTS: Script[] = [
+[
   {
     "id": "win-1",
     "categoryId": "win",
     "subCategoryId": "win-disable-os-data-collection",
     "name": "Disable Telemetry",
     "description": "Stops Windows from collecting and sending diagnostic and usage data to Microsoft.",
-    "code": "# Disable Telemetry Service\nsc config \"DiagTrack\" start=disabled\nsc stop \"DiagTrack\"\necho \"Telemetry service disabled.\""
+    "code": "\n# Disable Telemetry Service\nsc config \"DiagTrack\" start=disabled\nsc stop \"DiagTrack\"\necho \"Telemetry service disabled.\"\n    "
   },
   {
     "id": "win-2",
@@ -147,7 +13,7 @@ export const INITIAL_SCRIPTS: Script[] = [
     "subCategoryId": "win-remove-bloatware",
     "name": "Remove Bloatware Apps",
     "description": "Uninstalls common pre-installed applications like Candy Crush, Xbox apps, etc.",
-    "code": "# Example: Remove Candy Crush\nGet-AppxPackage *candycrush* | Remove-AppxPackage\necho \"Bloatware removal script executed (example). Add more apps as needed.\""
+    "code": "\n# Example: Remove Candy Crush\nGet-AppxPackage *candycrush* | Remove-AppxPackage\necho \"Bloatware removal script executed (example). Add more apps as needed.\"\n    "
   },
   {
     "id": "win-3",
@@ -155,7 +21,7 @@ export const INITIAL_SCRIPTS: Script[] = [
     "subCategoryId": "win-disable-os-data-collection",
     "name": "Disable Cortana",
     "description": "Disables the personal assistant to prevent background activity and data collection.",
-    "code": "# Disable Cortana through registry (requires admin)\nreg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search\" /v \"AllowCortana\" /t REG_DWORD /d 0 /f\necho \"Cortana disabled.\""
+    "code": "\n# Disable Cortana through registry (requires admin)\nreg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search\" /v \"AllowCortana\" /t REG_DWORD /d 0 /f\necho \"Cortana disabled.\"\n    "
   },
   {
     "id": "mac-1",
@@ -1291,7 +1157,7 @@ export const INITIAL_SCRIPTS: Script[] = [
     "subCategoryId": "mac-privacy-cleanup",
     "name": "Clear File Quarantine attribute from downloaded files",
     "description": "Clear File Quarantine attribute from downloaded files",
-    "code": "find ~/Downloads        \\\n        -type f         \\\n        -exec           \\\n            sh -c       \\\n                '\n                    attr=\"com.apple.quarantine\"\n                    file=\"{}\"\n                    if [[ $(xattr \"$file\") = *$attr* ]]; then\n                        if xattr -d \"$attr\" \"$file\" 2>/dev/null; then\n                            echo \"🧹 Cleaned attribute from \\\"$file\\\"\"\n                        else\n                            >&2 echo \"❌ Failed to clean attribute from \\\"$file\\\"\"\n                        fi\n                    else\n                        echo \"No attribute in \\\"$file\\\"\"\n                    fi\n                '       \\\n            {} \\;"
+    "code": "find ~/Downloads        \\\n        -type f         \\\n        -exec           \\\n            sh -c       \\\n                '\\\n                    attr=\"com.apple.quarantine\"\n                    file=\"{}\"\n                    if [[ $(xattr \"$file\") = *$attr* ]]; then\n                        if xattr -d \"$attr\" \"$file\" 2>/dev/null; then\n                            echo \"🧹 Cleaned attribute from \\\"$file\\\"\"\n                        else\n                            >&2 echo \"❌ Failed to clean attribute from \\\"$file\\\"\"\n                        fi\n                    else\n                        echo \"No attribute in \\\"$file\\\"\"\n                    fi\n                '       \\\n            {} \\;"
   },
   {
     "id": "mac-143",
@@ -1315,7 +1181,7 @@ export const INITIAL_SCRIPTS: Script[] = [
     "subCategoryId": "linux-configure-programs",
     "name": "Harden SSH Configuration",
     "description": "Strengthens SSH security by disabling root login and password authentication.",
-    "code": "# Harden SSH config (edit /etc/ssh/sshd_config)\n# Ensure these lines are present and uncommented:\n# PermitRootLogin no\n# PasswordAuthentication no\necho \"Remember to manually edit /etc/ssh/sshd_config and restart sshd.\""
+    "code": "\n# Harden SSH config (edit /etc/ssh/sshd_config)\n# Ensure these lines are present and uncommented:\n# PermitRootLogin no\n# PasswordAuthentication no\necho \"Remember to manually edit /etc/ssh/sshd_config and restart sshd.\"\n    "
   },
   {
     "id": "linux-2",
@@ -1323,44 +1189,20 @@ export const INITIAL_SCRIPTS: Script[] = [
     "subCategoryId": "linux-configure-programs",
     "name": "Install and Configure UFW",
     "description": "Sets up Uncomplicated Firewall (UFW) to block incoming connections by default.",
-    "code": "# Install UFW on Debian/Ubuntu\nsudo apt-get update\nsudo apt-get install ufw -y\n# Basic setup\nsudo ufw default deny incoming\nsudo ufw default allow outgoing\nsudo ufw allow ssh\nsudo ufw enable\necho \"UFW firewall is now enabled.\""
+    "code": "\n# Install UFW on Debian/Ubuntu\nsudo apt-get update\nsudo apt-get install ufw -y\n# Basic setup\nsudo ufw default deny incoming\nsudo ufw default allow outgoing\nsudo ufw allow ssh\nsudo ufw enable\necho \"UFW firewall is now enabled.\"\n    "
   },
   {
     "id": "browser-1",
     "categoryId": "browser",
     "name": "Clear Browser Cache",
     "description": "A general reminder and placeholder for scripts that would clear browser data.",
-    "code": "# This is a placeholder. Clearing browser data is typically done in browser settings.\n# For Firefox on Linux, you could do:\n# rm -rf ~/.cache/mozilla/firefox/*\necho \"Action required: Clear cache and cookies in your browser settings.\""
+    "code": "\n# This is a placeholder. Clearing browser data is typically done in browser settings.\n# For Firefox on Linux, you could do:\n# rm -rf ~/.cache/mozilla/firefox/*\necho \"Action required: Clear cache and cookies in your browser settings.\"\n    "
   },
   {
     "id": "browser-2",
     "categoryId": "browser",
     "name": "Disable WebRTC IP Leak",
     "description": "Suggests using an extension like uBlock Origin to prevent IP address leaks via WebRTC.",
-    "code": "# Action required: Install a browser extension like uBlock Origin or WebRTC Leak Prevent.\n# In uBlock Origin settings, check \"Prevent WebRTC from leaking local IP addresses.\"\necho \"Install a browser extension to prevent WebRTC leaks.\""
-  },
-  {
-    "name": "Clean Bash history",
-    "description": "Bash (Bourne-Again SHell) is from the GNU project. It is used by most distributions as their default shell.",
-    "code": "#!/usr/bin/env bash\n# https://privacy.sexy — v0.13.8 — Wed, 29 Oct 2025 11:55:26 GMT\nif [ \"$EUID\" -ne 0 ]; then\n  script_path=$([[ \"$0\" = /* ]] && echo \"$0\" || echo \"$PWD/${0#./}\")\n  sudo \"$script_path\" || (\n    echo 'Administrator privileges are required.'\n    exit 1\n  )\n  exit 0\nfi\nexport HOME=\"/home/${SUDO_USER:-${USER}}\" # Keep `~` and `$HOME` for user not `/root`.\n\n\n# ----------------------------------------------------------\n# --------------------Clear bash history--------------------\n# ----------------------------------------------------------\necho '--- Clear bash history'\nrm -fv ~/.bash_history\nsudo rm -fv /root/.bash_history\n# ----------------------------------------------------------\n\n\necho 'Your privacy and security is now hardened 🎉💪'\necho 'Press any key to exit.'\nread -n 1 -s",
-    "categoryId": "linux",
-    "subCategoryId": "linux-privacy-cleanup",
-    "id": "custom-1761739057636"
-  },
-  {
-    "name": "TOOLS BOOKS",
-    "description": "d",
-    "code": "https://privacy.xocode.info/",
-    "categoryId": "win",
-    "subCategoryId": "win-ui-for-privacy",
-    "id": "custom-1761751948383"
-  },
-  {
-    "name": "TOOLS BOOKS",
-    "description": "z",
-    "code": "z",
-    "categoryId": "linux",
-    "subCategoryId": "linux-privacy-cleanup",
-    "id": "custom-1761752109504"
+    "code": "\n# Action required: Install a browser extension like uBlock Origin or WebRTC Leak Prevent.\n# In uBlock Origin settings, check \"Prevent WebRTC from leaking local IP addresses.\"\necho \"Install a browser extension to prevent WebRTC leaks.\"\n    "
   }
-];
+]

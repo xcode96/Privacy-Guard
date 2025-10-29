@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 
 interface GitHubPublishModalProps {
@@ -76,7 +77,7 @@ export const GitHubPublishModal: React.FC<GitHubPublishModalProps> = ({ isOpen, 
               type="text"
               value={filePath}
               onChange={(e) => setFilePath(e.target.value)}
-              placeholder="public/data.json"
+              placeholder="e.g., public/scripts.json" // Updated placeholder
               className="w-full bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-md p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
               required
             />

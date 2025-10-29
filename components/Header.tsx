@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { ShieldIcon } from './icons/ShieldIcon';
 import { SearchIcon } from './icons/SearchIcon';
@@ -12,9 +13,10 @@ interface HeaderProps {
     hasUnsavedChanges: boolean;
     onPublish: () => void;
     publisherStatus: 'idle' | 'publishing' | 'success' | 'error';
+    isLoading: boolean; // New prop
 }
 
-export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchQueryChange, isAdmin, hasUnsavedChanges, onPublish, publisherStatus }) => {
+export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchQueryChange, isAdmin, hasUnsavedChanges, onPublish, publisherStatus, isLoading }) => {
     
     const getPublishButtonContent = () => {
         switch (publisherStatus) {
@@ -50,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchQueryChange
     
     const getPublishButtonClass = () => {
         let baseClass = "text-white font-semibold px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-2 w-48";
-        if (!hasUnsavedChanges) {
+        if (!hasUnsavedChanges || isLoading) { // Disable if loading
              return `${baseClass} bg-zinc-700 cursor-not-allowed opacity-50`;
         }
         switch (publisherStatus) {
@@ -84,7 +86,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchQueryChange
                         onClick={onPublish}
                         className={getPublishButtonClass()}
                         title="Publish updated data to GitHub"
-                        disabled={!hasUnsavedChanges || publisherStatus === 'publishing'}
+                        disabled={!hasUnsavedChanges || publisherStatus === 'publishing' || isLoading} // Disable if isLoading
                     >
                         {getPublishButtonContent()}
                     </button>
@@ -96,6 +98,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchQueryChange
                         onChange={(e) => onSearchQueryChange(e.target.value)}
                         placeholder="Search all scripts..."
                         className="w-full bg-zinc-800/50 text-zinc-200 border border-zinc-700 rounded-md py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-orange-500 focus:outline-none transition-all"
+                        disabled={isLoading} // Disable search if isLoading
                     />
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
                         <SearchIcon className="w-5 h-5" />
