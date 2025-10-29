@@ -185,10 +185,16 @@ ${shellScripts.map(s => `# - ${s.name}`).join('\\n')}
   }, [selectedScripts, scripts]);
 
   const handleAddNewScript = (newScript: Omit<Script, 'id'>) => {
+    const scriptWithId: Script = { 
+      ...newScript, 
+      id: `custom-${Date.now()}` 
+    };
     setScripts(prev => [
       ...prev,
-      { ...newScript, id: `custom-${Date.now()}` }
+      scriptWithId
     ]);
+    setSelectedCategory(scriptWithId.categoryId); // Update selected category
+    setSearchQuery(''); // Clear search query
     setHasUnsavedChanges(true);
     setIsAddModalOpen(false);
   };
