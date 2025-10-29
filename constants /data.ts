@@ -1340,11 +1340,10 @@ export const INITIAL_SCRIPTS: Script[] = [
     "code": "# Action required: Install a browser extension like uBlock Origin or WebRTC Leak Prevent.\n# In uBlock Origin settings, check \"Prevent WebRTC from leaking local IP addresses.\"\necho \"Install a browser extension to prevent WebRTC leaks.\""
   },
   {
-    "name": "Clean Bash history",
-    "description": "Bash (Bourne-Again SHell) is from the GNU project. It is used by most distributions as their default shell.",
-    "code": "#!/usr/bin/env bash\n# https://privacy.sexy — v0.13.8 — Wed, 29 Oct 2025 11:55:26 GMT\nif [ \"$EUID\" -ne 0 ]; then\n  script_path=$([[ \"$0\" = /* ]] && echo \"$0\" || echo \"$PWD/${0#./}\")\n  sudo \"$script_path\" || (\n    echo 'Administrator privileges are required.'\n    exit 1\n  )\n  exit 0\nfi\nexport HOME=\"/home/${SUDO_USER:-${USER}}\" # Keep `~` and `$HOME` for user not `/root`.\n\n\n# ----------------------------------------------------------\n# --------------------Clear bash history--------------------\n# ----------------------------------------------------------\necho '--- Clear bash history'\nrm -fv ~/.bash_history\nsudo rm -fv /root/.bash_history\n# ----------------------------------------------------------\n\n\necho 'Your privacy and security is now hardened 🎉💪'\necho 'Press any key to exit.'\nread -n 1 -s",
-    "categoryId": "linux",
-    "subCategoryId": "linux-privacy-cleanup",
-    "id": "custom-1761739057636"
+    "name": "d",
+    "description": "d",
+    "code": "te",
+    "categoryId": "browser",
+    "id": "custom-1761751451030"
   }
 ];
